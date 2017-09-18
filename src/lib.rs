@@ -235,6 +235,20 @@ impl Builder {
             })
             .count();
 
+        self.options
+            .no_hash_types
+            .get_items()
+            .iter()
+            .map(|item| {
+                output_vector.push("--no-hash".into());
+                output_vector.push(
+                    item.trim_left_matches("^")
+                        .trim_right_matches("$")
+                        .into(),
+                );
+            })
+            .count();
+
         if !self.options.layout_tests {
             output_vector.push("--no-layout-tests".into());
         }
@@ -732,6 +746,12 @@ impl Builder {
         self
     }
 
+    /// Do not derive `Hash` for the given type. Regular expressions are supported.
+    pub fn no_hash_types<T: AsRef<str>>(mut self, arg: T) -> Builder {
+        self.options.no_hash_types.insert(arg);
+        self
+    }
+
     /// Mark the given enum (or set of enums, if using a pattern) as a set of
     /// constants that should be put into a module.
     ///
@@ -1180,6 +1200,9 @@ struct BindgenOptions {
     /// The enum patterns to mark an enum as a module of constants.
     constified_enum_modules: RegexSet,
 
+    /// The set of types we should not derive `Hash` for.
+    pub no_hash_types: RegexSet,
+
     /// Whether we should generate builtins or not.
     builtins: bool,
 
@@ -1345,6 +1368,7 @@ impl BindgenOptions {
         self.constified_enum_modules.build();
         self.rustified_enums.build();
         self.no_partialeq_types.build();
+        self.no_hash_types.build();
     }
 
     /// Update rust target version
@@ -1376,6 +1400,7 @@ impl Default for BindgenOptions {
             bitfield_enums: Default::default(),
             rustified_enums: Default::default(),
             constified_enum_modules: Default::default(),
+            no_hash_types: Default::default(),
             builtins: false,
             links: vec![],
             emit_ast: false,

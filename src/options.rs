@@ -277,6 +277,13 @@ where
                 .takes_value(true)
                 .multiple(true)
                 .number_of_values(1),
+            Arg::with_name("no-hash")
+                .long("no-hash")
+                .help("Do not derive Hash for all types matching <regex>.")
+                .value_name("regex")
+                .takes_value(true)
+                .multiple(true)
+                .number_of_values(1),
         ]) // .args()
         .get_matches_from(args);
 
@@ -553,9 +560,15 @@ where
         builder = builder.rustfmt_configuration_file(Some(path));
     }
 
+<<<<<<< HEAD
     if let Some(no_partialeq) = matches.values_of("no-partialeq") {
         for regex in no_partialeq {
             builder = builder.no_partialeq(String::from(regex));
+=======
+    if let Some(nohashes) = matches.values_of("no-hash") {
+        for regex in nohashes {
+            builder = builder.no_hash_types(regex);
+>>>>>>> WIP - work through configring CLI flags.
         }
     }
 
